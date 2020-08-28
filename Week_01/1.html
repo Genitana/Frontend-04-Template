@@ -17,7 +17,7 @@
 <script>
 
     let pattern = [
-        [0,0,0],
+        [2,1,0],
         [0,0,0],
         [0,0,0]
     ];
@@ -117,12 +117,49 @@
                 let tmp =  clone(pattern);
                 tmp[i][j] = color;
                 if (check(tmp, color)) {
-                    return true;
+                    return [j, i];
                 }
             }
         } 
-        return false;
+        return null;
+    }
+
+    /**
+    * 找出最好的步骤
+    *  1:赢，0：和局，-1：输
+    */
+    function bestChoice(pattern, color){
+        let p ;
+        if (p = willWin(pattern, color)) {
+            return {
+                point: p,
+                result: 1,
+            }
+        }
+        let result = -2;
+        let point = null;
+        for (let i = 0; i< 3;i++){
+            for (let j = 0;j<3;j++){
+                if(pattern[i][j]){
+                    continue;
+                }
+                let tmp = clone(pattern);
+                tmp[i][j] = color;
+                // 测试对手的棋是好是坏
+                let r = bestChoice(tmp, 3 - color).result;
+                //对手的棋很坏，则说明我方下得好
+                if (-r > result) {
+                    result = -r;
+                    point = [j,i];
+                }
+            }
+        }
+        return {
+            point: point,
+            result: point ? result: 0,
+        }
     }
 
     show();
+    console.log("最好的结果：",bestChoice(pattern,color));
 </script>
