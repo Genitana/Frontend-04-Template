@@ -1,5 +1,5 @@
 let pattern = [
-    2,1,0,
+    0,0,0,
     0,0,0,
     0,0,0
 ];
@@ -28,10 +28,11 @@ function move(x, y) {
         alert(color === 2 ? "❌ is winner !" : "⭕️ is winner !")
     }
     color = 3 - color;
+    console.log(bestChoice(pattern, color));
     show();
-    if (willWin(pattern, color)) {
-        console.log(color === 2 ? "❌ will win !" : "⭕️ will win !")
-    }
+    // if (willWin(pattern, color)) {
+    //     console.log(color === 2 ? "❌ will win !" : "⭕️ will win !")
+    // }
 }
 
 function check(pattern, color) {
@@ -107,22 +108,22 @@ function willWin(pattern, color){
 }
 
 /**
-* 找出最好的步骤
-*  1:赢，0：和局，-1：输
-*/
+ * 找出最好的步骤
+ * point: 位置
+ * result: 1:赢，0：和局，-1：输
+ */
 function bestChoice(pattern, color){
-    let p ;
-    if (p = willWin(pattern, color)) {
+    let point = willWin(pattern, color) ;
+    if (point) {
         return {
-            point: p,
+            point: point,
             result: 1,
         }
     }
-    let result = -2;
-    let point = null;
-    for (let i = 0; i< 3;i++){
+    let result = -1;
+    outer:for (let i = 0; i< 3;i++){
         for (let j = 0;j<3;j++){
-            if(pattern[i*3 + j]){
+            if(pattern[i*3 + j] !== 0 ){
                 continue;
             }
             let tmp = clone(pattern);
@@ -130,9 +131,13 @@ function bestChoice(pattern, color){
             // 测试对手的棋是好是坏
             let r = bestChoice(tmp, 3 - color).result;
             //对手的棋很坏，则说明我方下得好
-            if (-r > result) {
+            if (-r >= result) {
                 result = -r;
                 point = [j,i];
+            }
+            //最优解，直接跳出循环
+            if (result === 1) {
+                break outer;
             }
         }
     }
@@ -143,4 +148,4 @@ function bestChoice(pattern, color){
 }
 
 show();
-console.log("最好的结果：",bestChoice(pattern,color));
+// console.log("最好的结果：",bestChoice(pattern,color));
