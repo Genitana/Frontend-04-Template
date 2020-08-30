@@ -28,7 +28,7 @@ function move(x, y) {
         alert(color === 2 ? "❌ is winner !" : "⭕️ is winner !")
     }
     color = 3 - color;
-    console.log(bestChoice(pattern, color));
+    console.log("[j i]", bestChoice(pattern, color));
     show();
     // if (willWin(pattern, color)) {
     //     console.log(color === 2 ? "❌ will win !" : "⭕️ will win !")
@@ -88,7 +88,10 @@ function check(pattern, color) {
 }
 
 function clone(pattern) {
-    return JSON.parse(JSON.stringify(pattern));
+    // return JSON.parse(JSON.stringify(pattern));
+
+    //一维数组可以用Object.create方法
+    return Object.create(pattern);
 }
 
 function willWin(pattern, color){
