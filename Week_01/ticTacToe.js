@@ -1,9 +1,9 @@
 let pattern = [
     0,0,0,
-    0,0,0,
+    0,1,0,
     0,0,0
 ];
-let color = 1;
+let color = 2;
 function show() {
     let board = document.getElementById("board");
     board.innerHTML = "";
@@ -15,14 +15,14 @@ function show() {
             cell.innerText = 
                 pattern[i*3 +j] === 2 ? "❌" :
                 pattern[i*3 +j] === 1 ? "⭕️" : "";
-            cell.addEventListener("click", ()=> move(j, i))    
+            cell.addEventListener("click", ()=> userMove(j, i))    
             board.appendChild(cell);
         }
         board.appendChild(document.createElement("br"));
     }
 }
 
-function move(x, y) {
+function userMove(x, y) {
     pattern[y*3 +x] = color;
     if (check(pattern, color)){
         alert(color === 2 ? "❌ is winner !" : "⭕️ is winner !")
@@ -30,9 +30,26 @@ function move(x, y) {
     color = 3 - color;
     console.log("[j i]", bestChoice(pattern, color));
     show();
+    computerMove();
     // if (willWin(pattern, color)) {
     //     console.log(color === 2 ? "❌ will win !" : "⭕️ will win !")
     // }
+}
+
+/**
+ * 电脑下棋
+ */
+function computerMove(){
+    let choice = bestChoice(pattern, color)
+    if(choice.point) {
+        // 返回的是[j,i]，所以这里到颠倒
+        pattern[choice.point[1]*3 + choice.point[0]] = color;
+    }
+    if (check(pattern, color)){
+        alert(color === 2 ? "❌ is winner !" : "⭕️ is winner !")
+    }
+    color = 3 - color;
+    show();
 }
 
 function check(pattern, color) {
