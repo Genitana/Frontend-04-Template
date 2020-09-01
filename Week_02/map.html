@@ -1,0 +1,27 @@
+<!-- <!DOCTYPE html> -->
+<!-- TODO 这里如果用这个HTML5的声明，css样式就会不对,待研究 -->
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .cell {
+            display: inline-flex;
+            line-height: 7px;
+            width: 6px;
+            height: 6px;
+            background-color: grey;
+            border-bottom: solid 1px white;
+            border-right: solid 1px white;
+            vertical-align: top;
+        }
+        #container{
+            width: 701px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="container"> 
+    </div>
+    <button onclick="localStorage['map'] = JSON.stringify(map)">save</button>
+</body>
+<script src="./map.js"></script>
