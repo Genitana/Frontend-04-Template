@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <style>
         .cell {
-            display: inline-flex;
+            /* 用inline-flex，点击空白的地方（必须），页面cup占用率100%，页面会卡死掉，原因未知，但是用inline-block不会产生这个问题 */
+            /* display: inline-flex;  */
+            display: inline-block;
             line-height: 7px;
             width: 6px;
             height: 6px;

@@ -1,4 +1,4 @@
-let map = localStorage["map"] ? JSON.parse(localStorage["map"]) : Array(200).fill(0);
+let map = localStorage["map"] ? JSON.parse(localStorage["map"]) : Array(10000).fill(0);
 let container = document.getElementById("container");
 for (let y = 0; y < 100 ; y++) {
     for( let x = 0; x < 100; x++) {
@@ -34,7 +34,7 @@ document.addEventListener("mousedown", e => {
 document.addEventListener("mouseup", () =>  mousedown = false);
 
 //因为要使用右键，所以要把contextmenu事件preventDefault掉，不然会弹出菜单
-document.addEventListener("contextmenu", e => e.preventDefault); 
+document.addEventListener("contextmenu", e => e.preventDefault()); 
 
 /**
  * 广度优先搜索
