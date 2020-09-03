@@ -18,6 +18,36 @@
     <div id="container"></div>
     <button onclick="localStorage['map'] = JSON.stringify(map)">save</button>
 <script >
+    
+class Sorted {
+    /**
+     * @param {*} data 
+     * @param {*} compare compare函数(能传compare函数是非常重要的)
+     */
+    constructor(data, compare){
+        this.data = data;
+        this.compare = compare || ((a,b) => a-b);
+    }
+    take(){
+        if (!this.data.length) {
+            return; //如果data为空，返回undefined
+        }
+        let min = this.data[0];
+        let minIndex = 0;
+        for(let i = 1; i < this.data.length; i++) {
+            if (this.compare(this.data[i], min) < 0){
+                min = this.data[i];
+                minIndex = i;
+            }
+        }
+        // 把最后一个的值覆盖到最小的位置，然后把最后一个pop出去
+        //min之前已经赋值了的
+        this.data[minIndex] = this.data[this.data.length -1];
+        this.data.pop();
+        return min;
+    }
+
+}
 let map = localStorage["map"] ? JSON.parse(localStorage["map"]) : Array(10000).fill(0);
 let container = document.getElementById("container");
 for (let y = 0; y < 100 ; y++) {
