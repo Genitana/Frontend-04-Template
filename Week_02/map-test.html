@@ -70,23 +70,29 @@ function sleep(milliseconds) {
  * 
  * 如果把这里的push和shift改为push和pop,queue就变成了栈，整个算法就变成了深度优先搜索
  */
-async function path(map, start, end) {
-    //这个集合，是所有搜索算法的灵魂，所有的搜索算法的差异部分其实完全就在于这个queue集合里面
-    let queue = [start];
+async function findPath(map, start, end) {
+    
+    let queue = [start];//这个集合，是所有搜索算法的灵魂，所有的搜索算法的差异部分其实完全就在于这个queue集合里面
 
-    async function insert(x, y){
+    let table = Object.create(map);
 
+    /**
+     * 往队列里插入值
+     * @param {*} pre 上一个的点的位置
+     */
+    async function insert(x, y, pre){
         // 等于100应该也是可以的
         if (x < 0 || x >=100 || y < 0 || y >= 100) {
             return;
         }
-        if (map[y*100 + x]) {
+        if (table[y*100 + x]) {
             return;
         }
-        await sleep(2);
+        // await sleep(10);
         container.children[y*100 + x].style.backgroundColor = "lightgreen";
         //遍历过的标记为2
-        map[y*100 + x] = 2;
+        // map[y*100 + x] = 2;
+        table[y*100 + x] = pre; //把前一个节点存起来
         queue.push([x, y]);
     }
 
@@ -94,16 +100,28 @@ async function path(map, start, end) {
         // 如果找到了end，则退出
         let [x, y] = queue.shift();
         // console.log(x, y)
-        if (x === end[0] && y === end[1]) {
-            return true;
+        if (x === end[0] && y === end[1]) { //找到终点
+            let path = [];
+            while(x != start[0] || y != start[1]) {
+                path.push(map[y*100 +x]);
+                [x,y] = table[y*100 + x];
+                await sleep(30);
+                container.children[y*100 + x].style.backgroundColor = "purple";
+            }
+            return path;
         }
         // 把上下左右的都加入queue
-       await insert(x+1, y);
-       await insert(x-1, y);
-       await insert(x, y+1);
-       await insert(x, y-1);
+       await insert(x+1, y, [x,y]);
+       await insert(x-1, y,[x,y]);
+       await insert(x, y+1,[x,y]);
+       await insert(x, y-1,[x,y]);
+       //斜线
+       await insert(x+1, y-1, [x,y]);
+       await insert(x-1, y-1,[x,y]);
+       await insert(x-1, y+1,[x,y]);
+       await insert(x+1, y+1,[x,y]);
 
     }
-    return false;
+    return null;
 }
 </script>
