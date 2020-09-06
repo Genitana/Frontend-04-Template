@@ -37,6 +37,70 @@ function* tokenize(source) {
     }
 }
 
-for (let token  of tokenize("1024 + 10 * 25")) {
-    console.log(token);
+let source = [];
+
+for (let token  of tokenize("10 * 25 / 2")) {
+    if(token.type !== "Whitespace" && token.type !== "LineTerminator"){
+        source.push(token);
+    }
 }
+
+function Expression(tokens) {
+
+}
+
+function AdditiveExpression(source){
+
+}
+/**
+ * MultiplicativeExpression的产生式有3个，所以对应三种逻辑
+ * 1, Number  (一个)
+ * 2，MultiplicativeExpression * Number （三个）
+ * 3，MultiplicativeExpression / Number （三个）
+ * @param {*} source 
+ */
+function MultiplicativeExpression(source){
+    if(source[0].type === "Number") {
+       let node = {
+           type: "MultiplicativeExpression",
+           children: [source[0]]
+       } 
+       source[0] = node;
+       // 递归
+       return MultiplicativeExpression(source);
+    }
+    if(source[0].type === "MultiplicativeExpression" && source[1].type === "*"){
+        let node = {
+            type: "MultiplicativeExpression",
+            operator: "*",
+            children:[]
+        }
+        //这里是符合第二个产生式，所以把前面3个封装成一个node
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        source.unshift(node);
+        return MultiplicativeExpression(source);
+    }
+    if(source[0].type === "MultiplicativeExpression" && source[1].type === "/"){
+        let node = {
+            type: "MultiplicativeExpression",
+            operator: "/",
+            children:[]
+        }
+        //这里是符合第三个产生式，所以把前面3个封装成一个node
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        node.children.push(source.shift())
+        source.unshift(node);
+        return MultiplicativeExpression(source);
+    }
+    // 递归结束的条件
+    if(source[0].type === "MultiplicativeExpression") {
+        return source[0]
+    }
+    // 正常情况应该走不到这句
+    return MultiplicativeExpression(source);
+}
+
+console.log(MultiplicativeExpression(source));
