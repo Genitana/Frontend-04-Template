@@ -1,11 +1,11 @@
 class Sorted {
     /**
-     * @param {*} data 
+     * @param {*} data 数组
      * @param {*} compare compare函数(能传compare函数是非常重要的)
      */
     constructor(data, compare){
-        this.data = data;
-        this.compare = compare || ((a,b) => a-b);
+        this.data = data.slice(); //slice()没有参数，实际上等于返回一个原数组的拷贝。
+        this.compare = compare || ((a,b) => a - b);
     }
     take(){
         if (!this.data.length) {
@@ -24,6 +24,13 @@ class Sorted {
         this.data[minIndex] = this.data[this.data.length -1];
         this.data.pop();
         return min;
+    }
+
+    give(v){
+        this.data.push(v);
+    }
+    get length(){
+        return this.data.length;
     }
 
 }
@@ -82,7 +89,8 @@ function sleep(milliseconds) {
  */
 async function findPath(map, start, end) {
     
-    let queue = [start];//这个集合，是所有搜索算法的灵魂，所有的搜索算法的差异部分其实完全就在于这个queue集合里面
+    //let queue = [start];//这个集合，是所有搜索算法的灵魂，所有的搜索算法的差异部分其实完全就在于这个queue集合里面
+    let queue = new Sorted([start], (a, b) => distance(a) - distance(b));
 
     let table = Object.create(map);
 
@@ -103,12 +111,20 @@ async function findPath(map, start, end) {
         //遍历过的标记为2
         // map[y*100 + x] = 2;
         table[y*100 + x] = pre; //把前一个节点存起来
-        queue.push([x, y]);
+        queue.give([x, y]);
     }
 
-    while (queue.length > 0) {
+    /**
+     * 比较point跟end点之前的距离，因为只是比较大小，所以不用开根号算距离
+     * @param {*} point 
+     */
+    function distance(point){
+        return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2 ;
+    }
+
+    while (queue.length) {
         // 如果找到了end，则退出
-        let [x, y] = queue.shift();
+        let [x, y] = queue.take();
         // console.log(x, y)
         if (x === end[0] && y === end[1]) { //找到终点
             let path = [];
