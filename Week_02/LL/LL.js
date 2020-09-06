@@ -39,18 +39,68 @@ function* tokenize(source) {
 
 let source = [];
 
-for (let token  of tokenize("10 * 25 / 2")) {
+for (let token  of tokenize("1 + 2 * 5 + 3")) {
     if(token.type !== "Whitespace" && token.type !== "LineTerminator"){
         source.push(token);
     }
 }
 
 function Expression(tokens) {
-
+    if(source[0].type === "AdditiveExpression" && source[1] && source[1].type === "EOF"){
+        let node = {
+            type: "Expression",
+            children: [source.shift(), source.shift()]
+        }
+        source.unshift(node);
+        return node;
+    }
+    AdditiveExpression(source);
+    return Expression(source);
 }
 
+/**
+ * AdditiveExpression的产生式有5个，因为包含了MultiplicativeExpression，所以复杂些
+ */
 function AdditiveExpression(source){
-
+    if(source[0].type === "MultiplicativeExpression"){
+        let node = {
+            type: "AdditiveExpression",
+            children:[source[0]]
+        }
+        source[0] = node;
+        return AdditiveExpression(source);
+    }
+    if(source[0].type === "AdditiveExpression" && source[1] && source[1].type === "+") {
+        let node = {
+            type: "AdditiveExpression",
+            operator: "+",
+            children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        MultiplicativeExpression(source);   //如果是 1 + 2 * 3 ，就需要把后面的先处理掉，也就是要把非终结符处理掉
+        node.children.push(source.shift());
+        source.unshift(node);
+        return AdditiveExpression(source);
+    }
+    if(source[0].type === "AdditiveExpression" && source[1] && source[1].type === "-") {
+        let node = {
+            type: "AdditiveExpression",
+            operator: "-",
+            children: []
+        }
+        node.children.push(source.shift());
+        node.children.push(source.shift());
+        MultiplicativeExpression(source);   //如果是 9 - 2 * 3 ，就需要把后面的先处理掉，也就是要把非终结符处理掉
+        node.children.push(source.shift());
+        source.unshift(node);
+        return AdditiveExpression(source);
+    }
+    if(source[0].type === "AdditiveExpression") {
+        return source[0];
+    }
+    MultiplicativeExpression(source);
+    return AdditiveExpression(source);
 }
 /**
  * MultiplicativeExpression的产生式有3个，所以对应三种逻辑
@@ -103,4 +153,6 @@ function MultiplicativeExpression(source){
     return MultiplicativeExpression(source);
 }
 
-console.log(MultiplicativeExpression(source));
+// console.log(MultiplicativeExpression(source));
+// console.log(AdditiveExpression(source));
+console.log(Expression(source));
