@@ -18,18 +18,18 @@
 
 语法的定义：
 
-\<Expression\>::=<br>
+\<Expression\>::=  
  &nbsp;&nbsp;&nbsp;&nbsp;\<AdditiveExpression\><span style="background-color:Teal;">\<EOF\></span>
 
- \<AdditiveExpression\>::=<br>
- &nbsp;&nbsp;&nbsp;&nbsp;\<MultiplicativeExpression\><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<+\></span>\<MultiplicativeExpression\><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<-\></span>\<MultiplicativeExpression\><br>
+ \<AdditiveExpression\>::=  
+ &nbsp;&nbsp;&nbsp;&nbsp;\<MultiplicativeExpression\>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<+\></span>\<MultiplicativeExpression\>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<-\></span>\<MultiplicativeExpression\>  
  
- \<MultiplicativeExpression\>::=<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="background-color:Teal;">\<Number\></span><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\<*\>\<Number\></span><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\</\>\<Number\></span><br>
+ \<MultiplicativeExpression\>::=  
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="background-color:Teal;">\<Number\></span>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\<*\>\<Number\></span>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\</\>\<Number\></span>  
 </br>
 
 语法的定义，我们可以认为,因为加号和乘号(加法和乘法),它是有一个优先级关系的，所以说我们需要用JavaScript部分的产生式去定义它的加法和乘法运算，所以说我们需要把加减乘除给它做成一个嵌套的解构。我们认为加法是由左右两个乘法组成的。并且加法还是可以进行连加的，所以说加法应该是一个重复自身的一个序列。
@@ -49,18 +49,18 @@ MultiplicativeExpression,它的定义是一个用乘号或除号相连接的Numb
 #### LL语法分析是怎么做的
 以加法表达式为例：
 
- \<AdditiveExpression\>::=<br>
- &nbsp;&nbsp;&nbsp;&nbsp;\<MultiplicativeExpression\><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<+\></span>\<MultiplicativeExpression\><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<-\></span>\<MultiplicativeExpression\><br>
+ \<AdditiveExpression\>::=  
+ &nbsp;&nbsp;&nbsp;&nbsp;\<MultiplicativeExpression\>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<+\></span>\<MultiplicativeExpression\>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<-\></span>\<MultiplicativeExpression\>  
  
  我们总是从输入的序列里面，我们去看它当前我们能够拿到的是什么样的东西。上面这三条产生式的规则里面，如果我们在处理AdditiveExpression，那么它的找到的第一个符号symbol会是什么呢？我们从上面产生式里看到，它可能会面临两种情况，第一种就是开头是一个MultiplicativeExpression，第二种情况就是一个AdditiveExpression。那么是不是就只有这两种情况呢？当然不是了，因为这个乘法表达式很可能还是一个未解析的状态，所以我们需要把乘法展开，把MultiplicativeExpression展开后如下：
-  \<AdditiveExpression\>::=<br>
-&nbsp;&nbsp;&nbsp;&nbsp;<span style="background-color:Teal;">\<Number\></span><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\<*\>\<Number\></span><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\</\>\<Number\></span><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<+\></span>\<MultiplicativeExpression\><br>
- &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<-\></span>\<MultiplicativeExpression\><br>
+  \<AdditiveExpression\>::=  
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="background-color:Teal;">\<Number\></span>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\<*\>\<Number\></span>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<MultiplicativeExpression\><span style="background-color:Teal;">\</\>\<Number\></span>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<+\></span>\<MultiplicativeExpression\>  
+ &nbsp;&nbsp;&nbsp;&nbsp;|\<AdditiveExpression\><span style="background-color:Teal;">\<-\></span>\<MultiplicativeExpression\>  
 
  那么所以说，它的第一种符号有3种可能性：Number、MultiplicativeExpression、AdditiveExpression。如果我们遇到了Number或MultiplicativeExpression，我们是不是就应该直接把它当做乘法处理呢？我们只看一个字符是不够的，我们需要看它第二个输入的元素，它是乘号除号，还是加号减号，因为原来的MultiplicativeExpression还是在的(<span style="color:red">什么意思？待理解</span>)。所以说，我们通过这个就可以得出来一个从左到右扫描，然后从左到右去归并的这样一个语法分析的算法，即 **LL语法分析**。
 
