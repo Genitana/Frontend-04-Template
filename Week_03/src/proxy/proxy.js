@@ -1,14 +1,17 @@
 let callbacks = new Map();
+let reactivities = new Map();
+
 let useReactivities = [];
 
 let  object = {
-    a: 1,
+    a: {b: 11},
     b: 2,
 }
 
 // 对 po设置属性就会触发操作，对不存在的属性设置值也会触发，对object操作不会
-let po = reactive(object)
-effect(() => console.log("callback,", po.a));
+let po = reactive(object);
+
+effect(() => console.log("callback,", po.a.b));
 
 function effect(callback) {
     // callbacks.push(callback);
@@ -28,8 +31,15 @@ function effect(callback) {
     }
 }
 
+/**
+ * 生成代理对象
+ * @param {*} object 
+ */
 function reactive(object) {
-    return new Proxy(object, {
+    if(reactivities.has(object)) {
+        return reactivities.get(object);
+    }
+    let proxy =  new Proxy(object, {
                 set(obj, prop, val){
                     obj[prop] = val;
                     if(callbacks.get(object) && callbacks.get(object).get(prop)){
@@ -42,8 +52,12 @@ function reactive(object) {
                 },
                 get(obj, prop){
                     useReactivities.push([obj, prop]);
-                    console.log("proxy get",obj[prop]);
+                    if(typeof obj[prop] === "object"){
+                        return reactive(obj[prop]);
+                    }
                     return obj[prop];
                 }
-    })
+    });
+    reactivities.set(object, proxy); // 把生成的proxy对象存起来
+    return proxy;
 }
