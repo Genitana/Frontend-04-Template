@@ -4,14 +4,33 @@ let reactivities = new Map();
 let useReactivities = [];
 
 let  object = {
-    a: {b: 11},
-    b: 2,
+    r: 1,
+    g: 2,
+    b: 3,
 }
 
 // 对 po设置属性就会触发操作，对不存在的属性设置值也会触发，对object操作不会
 let po = reactive(object);
 
-effect(() => console.log("callback,", po.a.b));
+effect(() => {
+    document.getElementById("r").value = po.r;  //把数据绑定到界面（input框）
+});
+effect(() => {
+    document.getElementById("g").value = po.g;
+});
+effect(() => {
+    document.getElementById("b").value = po.b;
+});
+
+effect(() => {
+    document.getElementById("color").style.backgroundColor = `rgb(${po.r},${po.g},${po.b})`;
+});
+
+//把界面的input框数据绑定到 绑定input事件，更新po的值
+document.getElementById("r").addEventListener("input", event => po.r = event.target.value); 
+document.getElementById("g").addEventListener("input", event => po.g = event.target.value);
+document.getElementById("b").addEventListener("input", event => po.b = event.target.value);
+
 
 function effect(callback) {
     // callbacks.push(callback);
