@@ -8,7 +8,7 @@ layout：通过layout步骤，把这颗DOM树上的所有元素产生的盒的�
 
 # TCP
 ISO-OSI七层网络模型：
- <img src="./image/ISO-OSI七层网络模型.png" width = "500" height = "300" alt="ISO-OSI七层网络模型" align=center />
+ <img src="./image/iso-osi七层网络模型.png" width = "500" height = "300" alt="ISO-OSI七层网络模型" align=center />
 
 
 在TCP层，传输数据的概念是流
