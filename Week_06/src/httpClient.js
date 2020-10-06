@@ -1,4 +1,5 @@
-const net   =require('net');
+const net   = require('net');
+const parser = require("../../Week_07/src/parser.js");
 
 class Request{
     constructor(options){
@@ -216,8 +217,11 @@ void async function(){
             name: "robert"
         }
     });
-    console.log('request.send()');
+
     let response = await request.send();
 
-    console.log("response:", response);
+    // console.log("response:", response);
+
+    // 解析body部分
+    let dom  = parser.parseHTML(response.body);
 }();
