@@ -1,5 +1,6 @@
 const net   = require('net');
 const parser = require("../../Week_07/src/parser.js");
+var CircularJSON = require('circular-json');
 
 class Request{
     constructor(options){
@@ -224,4 +225,8 @@ void async function(){
 
     // 解析body部分
     let dom  = parser.parseHTML(response.body);
+
+    // console.log(JSON.stringify(dom, null, "   "));
+    console.log(CircularJSON.stringify(dom, null, "   "));
+    
 }();

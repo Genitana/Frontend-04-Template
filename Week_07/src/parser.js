@@ -47,6 +47,39 @@ function match(element, selector){
     return false;
 }
 
+function specificity(selector){
+    var p = [0, 0, 0, 0];
+    // 只考虑 复合选择器里只有简单选择器的情况
+    var selectorParts = selector.split(" ");
+    for(var part of selectorParts){
+        if(part.charAt(0) === "#"){
+            //id选择器，第二位加一 
+            p[1] += 1;
+        }else if(part.charAt(0) === "."){
+            //class选择器，第三位加一
+            p[2] += 1;
+        }else {
+            //tag选择器，第三位加一
+            p[3] += 1;
+        }
+    }
+    return p;
+}
+
+function compare(sp1, sp2){
+    //高位能比出来，直接return
+
+    if(sp1[0] - sp2[0]){
+        return sp1[0] - sp2[0];
+    }else if(sp1[1] - sp2[1]){
+        return sp1[1] - sp2[1];
+    }else if(sp1[2] - sp2[2]){
+        return sp1[2] - sp2[2];
+    }
+
+    return sp1[3] - sp2[3];
+}
+
 /**
  * 计算CSS
  */
@@ -57,9 +90,9 @@ function computeCSS(element){
     if(!element.computedStyle){
         element.computedStyle = {};
 
+        //去匹配所有的css规则rules
         for(let rule of rules){
-            //对复杂选择器根据空格拆分 
-            // 为了跟elements顺序一致，把选择器也reserve
+            // 对复杂选择器根据空格拆分 （为了跟elements顺序一致，把选择器也reserve）
             var selectorParts = rule.selectors[0].split(" ").reverse();
 
             // 当前元素跟selectorParts[0]是否匹配
@@ -79,7 +112,7 @@ function computeCSS(element){
              * 用当前元素的父级elements，挨个去匹配CSS选择器规则，如果能匹配上，说明CSS规则匹配上了这个元素
              * 例如：第一个img元素的父级elements：[div元素, body元素, html元素, document元素]
              *      第一个img元素的选择器selectorParts：['#myid','div','body']
-             *       如果能匹配上selectorParts的所有规则，则说明当前CSS规则是适用于当前element元素的
+             *      如果能匹配上selectorParts的所有规则，则说明当前CSS规则是适用于当前element元素的
              */
 
             var j = 1; //j：当前选择器的位置
@@ -97,8 +130,29 @@ function computeCSS(element){
             }
 
             if(matched){
+                console.log("css匹配成功，element:", element.tagName, ", matched rule:", rule.selectors[0]);
+                
                 // 如果匹配到，把rules里面的所有css属性应用到这个元素上
-                console.log("匹配成功，element:", element.tagName, ", matched rule:", rule.selectors[0]);
+
+                var sp = specificity(rule.selectors[0]);
+                var computedStyle = element.computedStyle;
+                //rule.declarations就是css的样式
+                for(var declaration of rule.declarations){
+                    if(!computedStyle[declaration.property]){
+                        computedStyle[declaration.property] = {};
+                    }
+
+                    if(!computedStyle[declaration.property].specificity){
+                        computedStyle[declaration.property].value = declaration.value;
+                        computedStyle[declaration.property].specificity = sp;
+
+                        // 比较css优先级
+                    }else if(compare(computedStyle[declaration.property].specificity, sp) < 0){
+                        computedStyle[declaration.property].value = declaration.value;
+                        computedStyle[declaration.property].specificity = sp;
+                    }
+                }
+                console.log(element.computedStyle);
             }
         }
     }

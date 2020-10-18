@@ -24,7 +24,30 @@
 - 根据选择器的类型和元素属性，计算是否与当前元素匹配
 - 这里仅仅实现了三种基本选择器，实际的浏览器中要处理复合选择器 
 
+### 第六步总结（生成computed属性）
+- 一旦选择匹配，就应用选择器到元素上，形成computedStyle
+
+### 第七步总结（specificity的计算逻辑）
+- CSS规则根据specificity和后来优先规则覆盖
+- specificity是个四元组，越左边权重越高
+- 一个CSS规则的specificity根据包含的简单选择器相加而成
+
 
 <br><br>
 在CSS设计里面，有一条隐藏的潜规则，CSS设计会尽量保证所有的选择器都能够在startTag进入的时候就能够被判断。大部分的规则任然是遵循这个规则的，就是当DOM树构建到元素的startTag的步骤，就已经可以判断出来它能匹配哪些CSS规则了。
+
+priority 优先级
+specificity 特性、专一性（被翻译为css里的优先级）
+
+### specificity的计算逻辑
+
+specificity的计算是根据单个的复杂选择器去加起来去计算的
+
+specificity是一个四元组[inline, id, class, tagName],依次优先级会下降
+
+[0, &nbsp;&nbsp;&nbsp;&nbsp;0, &nbsp;&nbsp;&nbsp;&nbsp;0, &nbsp;&nbsp;&nbsp;&nbsp;0]
+
+inline   id   class  tagName
+
+例如：div div #id，那么是[0, 1, 0, 2] tagName重复了两次，所以是2
 
