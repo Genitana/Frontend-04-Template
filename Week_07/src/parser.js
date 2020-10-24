@@ -1,5 +1,5 @@
 const css  = require("css");
-
+const layout = require("../../Week_08/src/layout.js");
 const EOF  = Symbol("EOF"); // EOF: End of File
 
 let currentToken = null;
@@ -204,6 +204,13 @@ function emit(token) {
             if(top.tagName === "style"){
                 addCSSRules(top.children[0].content);
             }
+
+            /**
+             * flex布局是需要知道子元素的， 而子元素在结束标签之前肯定就已经都知道了，所以在endTag这里执行layout()函数
+             */
+            layout(top);
+
+
             stack.pop();
         }
         currentTextNode = null;

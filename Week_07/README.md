@@ -58,7 +58,7 @@
 - 在computeCSS函数中，我们必须知道元素的所有父元素才能判断元素与规则是否匹配
 - 我们从上一步的stack可以获取本元素的所有的父元素
 - 因为我们首先获取的是“当前元素”，所以我们获得和计算父元素匹配的顺序是从内向外<br>
- <img src="./image/获取父元素序列.png" width = "350" height = "100" alt="ISO-OSI七层网络模型" align=center />
+ <img src="./image/获取父元素序列.png" width = "350" height = "100" alt="获取父元素序列" align=center />
 
 ### 第四步总结（选择器与元素的匹配）
 - 选择器也要从当前元素向外排列
