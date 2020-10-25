@@ -28,3 +28,12 @@
 - 计算交叉轴方向
    - 根据每一行中的最大元素尺寸计算行高
    - 根据行高flex-align和item-align，确定元素具体位置
+
+<br><br>
+
+### 绘制总结
+#### 第一步总结（绘制单个元素）
+- 绘制需要依赖一个图形环境
+- 我们这里采用了npm包images
+- 绘制在一个viewport上进行
+- 与绘制相关的属性：background-color、border、background-image等

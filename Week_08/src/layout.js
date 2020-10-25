@@ -129,7 +129,8 @@ function layout(element){
           //把所有子元素的mainSize加起来就是它的主轴的size了
           for(var i  = 0; i < items.length; i++){
               var item = items[i];
-              if(itemStyle[mainSIze] !== null || itemStyle[mainSize] !== (void 0))
+              let itemStyle = getStyle(item);
+              if(itemStyle[mainSize] !== null || itemStyle[mainSize] !== (void 0))
                 elementStyle[mainSize] = elementStyle[mainSize] + itemStyle[mainSize];
           }
           isAutoMainSize = true;
@@ -156,7 +157,7 @@ function layout(element){
             //如果有flex属性，则说明这个元素是可伸缩的，它一定可以放到flexLine(行)里面
             flexLine.push(item);
         }else if (style.flexWrap === 'nowrap' && isAutoMainSize){ //不换行（no wrap）
-            mainSpace -= itemStyle[mainSIze];
+            mainSpace -= itemStyle[mainSize];
             // 如果item的交叉轴尺寸不为null，crossSpace取最高的那个值，因为flex布局里面，一行有多高取决于这一行里最高的元素有多高
             if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0))
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
@@ -172,7 +173,7 @@ function layout(element){
                 //放不下，则换行
                 
                 // 给数组加属性（第一次看到这种写法）
-                flexLine.mainSize = mainSize; //主轴剩余的空间
+                flexLine.mainSpace = mainSpace; //主轴剩余的空间
                 flexLine.crossSpace = crossSpace; //交叉轴的空间
                 flexLine = [item];  // 创建一个新行
                 flexLines.push(flexLine);
@@ -185,10 +186,10 @@ function layout(element){
                 flexLine.push(item);
             }
             //算一下主轴和交叉轴的尺寸
-            if(itemStyle[crossSize] !== null && itemStyle !== (void 0))
+            if(itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0))
                 crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
             
-            mainSpace -= itemStyle[mainSpace]
+            mainSpace -= itemStyle[mainSize];
         }
       }
       //元素已经没有了的话，给最后一行flexLine加上mainSpace
@@ -208,7 +209,7 @@ function layout(element){
           // overflow (happens only if container is single line), scale every item
 
           // 计算压缩比例
-          var scale = style[mainSize] / (style[mainSize] - mainSize);
+          var scale = style[mainSize] / (style[mainSize] - mainSpace);
 
           var currentMain = mainBase;
           for (var i = 0; i < items.length; i++){
@@ -263,29 +264,30 @@ function layout(element){
                 }
             }else {
                 //没有flex元素，需要把主轴方向的剩余空间，根据justifyContent规则进行分配
-
+                var step = 0;
                 if (style.justifyContent === "flex-start") {
                     var currentMain = mainBase;
-                    var step = 0; //每个元素之间的间隔
+                     step = 0; //每个元素之间的间隔
                 }
                 if (style.justifyContent === "flex-end") {
                     var currentMain = mainSpace * mainSign + mainBase;
-                    var step = 0;
+                     step = 0;
                 }
                 if (style.justifyContent === "center") {
                     var currentMain = mainSpace / 2 * mainSign + mainBase;
-                    var step = 0;
+                     step = 0;
                 }
                 if(style.justifyContent === "space-between") {
-                    var step = mainSpace / (items.length - 1) * mainSign; // 元素的间隔
+                     step = mainSpace / (items.length - 1) * mainSign; // 元素的间隔
                     var currentMain = mainBase;
                 }
                 if(style.justifyContent === "space-around") {
-                    var step = mainSpace / items.length * mainSign;
+                     step = mainSpace / items.length * mainSign;
                     var currentMain = step / 2 + mainBase;
                 }
                 for(var i = 0; i < items.length; i++) {
                     var item = items[i];
+                    let itemStyle = getStyle(item);
                     itemStyle[mainStart] = currentMain;
                     itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
                     currentMain = itemStyle[mainEnd] + step;
@@ -359,7 +361,7 @@ function layout(element){
         // 根据是否是stretch，来确定是否填满，还是对剩余空间做分配
         var lineCrossSize = style.alignContent === "stretch" 
             ? (items.crossSpace + crossSpace / flexLines.length)
-            : items.crossSize;
+            : items.crossSpace;
         
         // 计算每个元素的交叉轴的位置和尺寸
         for (var i = 0; i < items.length; i++){
@@ -385,9 +387,8 @@ function layout(element){
             }
             if(align === "stretch"){
                 itemStyle[crossStart] = crossBase;
-                itemStyle[crossEnd] = crossBase + 
-                    crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== undefined) ? itemStyle[crossSize] : lineCrossSize);
-                itemStyle[crossSize] = crossSize * (itemStyle[crossEnd] - itemStyle[crossStart]);
+                itemStyle[crossEnd] = crossBase + crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== undefined) ? itemStyle[crossSize] : lineCrossSize);
+                itemStyle[crossSize] = crossSign * (itemStyle[crossEnd] - itemStyle[crossStart]);
             }
         }
         crossBase += crossSign * (lineCrossSize + step);

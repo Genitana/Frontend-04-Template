@@ -188,32 +188,31 @@ function emit(token) {
         computeCSS(element);
 
         top.children.push(element);
-        element.parent = top;
+        // element.parent = top;
         
         if(!token.isSelfClosing){
             // 不是自封闭标签，就push进stack。(push进stack的目的是干啥？就为了配对？)
             stack.push(element);
         }
         currentTextNode = null;
+
     }else if(token.type === "endTag"){
         if(top.tagName !== token.tagName){
             //不配对就抛错
             throw new Error("Tag start end doesn't match!");
         }else{
-            /***** 遇到style标签，执行添加css规则的操作  (暂时不处理link标签的情况)  *****/
+            /** 遇到style标签，执行添加css规则的操作  (暂时不处理link标签的情况)  */
             if(top.tagName === "style"){
                 addCSSRules(top.children[0].content);
             }
-
-            /**
-             * flex布局是需要知道子元素的， 而子元素在结束标签之前肯定就已经都知道了，所以在endTag这里执行layout()函数
-             */
-            layout(top);
-
-
             stack.pop();
         }
+
+        /** flex布局是需要知道子元素的， 而子元素在结束标签之前肯定就已经都知道了，所以在endTag这里执行layout()函数 */
+        layout(top);
+
         currentTextNode = null;
+
     }else if(token.type === "text"){
         // 处理文本节点
 
@@ -358,7 +357,7 @@ function afterAttributeName(c) {
 
     }else{
         currentToken[currentAttribute.name] = currentAttribute.value;
-        currentAttribute.value = {
+        currentAttribute = {
             name: "",
             value: ""
         }
@@ -439,7 +438,7 @@ function unquotedAttributeValue(c) {
         return data;
     }else if("\u0000" === c){
 
-    }else if("\"" === c || "\'" === c || "<" === c || "=" === c || "`" === c){
+    }else if("\"" === c || "'" === c || "<" === c || "=" === c || "`" === c){
 
     }else if(EOF === c){
 
@@ -462,17 +461,10 @@ function selfClosingStartTag(c) {
 module.exports.parseHTML = function parseHTML(html) {
     let state = data;
     for(let c of html){
-        if(typeof state !== "function"){
-            console.error("qqqq");
-        }
-        try {
             
-            state = state(c);
-        } catch (error) {
-            console.error(error);
-        }
+        state = state(c);
     }
     state = state(EOF);
-    console.log(stack[0]);
+    // console.log(stack[0]);
     return stack[0];
 }
