@@ -235,7 +235,7 @@ void async function(){
     // 800*600 的图片作为视口
     let viewport = images(800, 600);
     
-    render(viewport, dom.children[0].children[3].children[1].children[3]);
-    viewport.save("viewport.jpg");
+    render(viewport, dom);
+    viewport.save("./Week_08/viewport.jpg");
     
 }();

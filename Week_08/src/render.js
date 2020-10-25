@@ -12,5 +12,12 @@ function render(viewport, element){
             viewport.draw(img, element.style.left||0, element.style.top||0);
         }
     }
+
+    // 渲染DOM只需递归就可以了
+    if(element.children){
+        for(let child of element.children){
+            render(viewport, child);
+        }
+    }
 }
 module.exports = render;
