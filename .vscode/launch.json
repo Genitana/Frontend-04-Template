@@ -16,7 +16,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch",
+            "name": "httpClient",
             // "skipFiles": [
             //     "<node_internals>/**"
             // ],

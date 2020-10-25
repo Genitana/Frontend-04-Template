@@ -59,8 +59,8 @@ function layout(element){
         style.justifyContent = "flex-start";
      if(!style.flexWrap || style.flexWrap === "auto")
         style.flexWrap = "nowrap";
-     if(!style.aliginContent || style.aliginContent === "auto")
-        style.aliginContent = "stretch";
+     if(!style.alignContent || style.alignContent === "auto")
+        style.alignContent = "stretch";
 
       var mainSize, mainStart, mainEnd, mainSign, mainBase,
           crossSize, crossStart, crossEnd, crossSign, crossBase;
@@ -194,7 +194,205 @@ function layout(element){
       //元素已经没有了的话，给最后一行flexLine加上mainSpace
       flexLine.mainSpace = mainSpace;
 
-      console.log(items);
+      if(style.flexWrap === "nowrap" || isAutoMainSize){
+          flexLine.crossSpace = (style[crossSize] !== undefined) ? style[crossSize] : crossSpace;
+      }else {
+          flexLine.crossSpace = crossSpace;
+      }
+
+      /** 计算主轴 */
+
+      // 若剩余空间为负数，所有flex元素为0，等比压缩剩余元素
+      // mainSpace < 0 只会发生在单行的情况
+      if (mainSpace < 0) {
+          // overflow (happens only if container is single line), scale every item
+
+          // 计算压缩比例
+          var scale = style[mainSize] / (style[mainSize] - mainSize);
+
+          var currentMain = mainBase;
+          for (var i = 0; i < items.length; i++){
+              var item = items[i];
+              var itemStyle = getStyle(item);
+
+              //如果是flex元素，直接置为0
+              if (itemStyle.flex) {
+                  itemStyle[mainSize] = 0;
+              }
+
+              //计算压缩后的尺寸
+              itemStyle[mainSize] = itemStyle[mainSize] * scale;
+
+              //计算 mainStart、mainEnd
+              itemStyle[mainStart] = currentMain;
+              itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
+              currentMain = itemStyle[mainEnd];
+          }
+      }else {
+          // 多行的情况
+          // 处理每个flex line
+          flexLines.forEach(function (items){
+
+            var mainSpace = items.mainSpace;
+            var flexTotal = 0;  // flex元素个数
+            for (var i = 0; i < items.length; i++){
+                var item = items[i];
+                var itemStyle = getStyle(item);
+
+                if((itemStyle.flex !== null) && itemStyle.flex !== undefined){
+                    flexTotal += itemStyle.flex;
+                    continue;
+                }
+            }
+
+            // 若有flex元素，则把mainSpace均匀的分配到每个flex元素
+            if (flexTotal > 0){
+                // 有flex元素，则永远会占满整个行
+                
+                var currentMain = mainBase;
+                for (var i = 0; i < items.length; i++){
+                    var item = items[i];
+                    var itemStyle = getStyle(item);
+
+                    if (itemStyle.flex){
+                        itemStyle[mainSize] = (mainSpace / flexTotal) * itemStyle.flex;
+                    }
+                    itemStyle[mainStart] = currentMain;
+                    itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
+                    currentMain = itemStyle[mainEnd];
+                }
+            }else {
+                //没有flex元素，需要把主轴方向的剩余空间，根据justifyContent规则进行分配
+
+                if (style.justifyContent === "flex-start") {
+                    var currentMain = mainBase;
+                    var step = 0; //每个元素之间的间隔
+                }
+                if (style.justifyContent === "flex-end") {
+                    var currentMain = mainSpace * mainSign + mainBase;
+                    var step = 0;
+                }
+                if (style.justifyContent === "center") {
+                    var currentMain = mainSpace / 2 * mainSign + mainBase;
+                    var step = 0;
+                }
+                if(style.justifyContent === "space-between") {
+                    var step = mainSpace / (items.length - 1) * mainSign; // 元素的间隔
+                    var currentMain = mainBase;
+                }
+                if(style.justifyContent === "space-around") {
+                    var step = mainSpace / items.length * mainSign;
+                    var currentMain = step / 2 + mainBase;
+                }
+                for(var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    itemStyle[mainStart] = currentMain;
+                    itemStyle[mainEnd] = itemStyle[mainStart] + mainSign * itemStyle[mainSize];
+                    currentMain = itemStyle[mainEnd] + step;
+                }
+            }
+          });
+
+      }
+
+     /** 
+      * 计算交叉轴尺寸
+      * align-items, align-self
+      */
+     var crossSpace;
+
+     if(!style[crossSize]) { // auto sizing
+        //父元素没有行高，则crossSpace=0
+        crossSpace = 0;
+        elementStyle[crossSize] = 0;
+        // 把撑开的高度加上去
+        for(var i = 0; i < flexLines.length; i++){
+            elementStyle[crossSize] +=  flexLines[i].crossSpace;
+        }
+     }else {
+         // 有行高，则用总的crossSize依次减掉每一行的crossSize，得到剩余的行高
+         crossSpace = style[crossSize];
+         for(var i = 0; i < flexLines.length; i++){
+             crossSpace -= flexLines[i].crossSpace;
+         }
+     }
+
+     if(style.flexWrap === "wrap-reverse") {
+         crossBase = style[crossSize];
+     }else {
+         crossBase = 0;
+     }
+     // todo 这个好像没用到？
+     var lineSize = style[crossSize] / flexLines.length;
+     
+     //   根据alignContent属性，来校正crossSpace 
+     var step;
+     if(style.alignContent === "flex-start"){
+         crossBase += 0;  // crossBase的增量为0
+         step = 0;
+     }
+     if(style.alignContent === "flex-end"){
+         //它的排布顺序是不变的，它只影响space在哪里
+         crossBase += crossSign * crossSpace; 
+         step = 0;
+     }
+     if(style.alignContent === "center"){
+         // 把剩余空间除以2
+         crossBase += crossSign * crossSpace / 2;
+         step = 0;
+     }
+     if(style.alignContent === "space-between") {
+         crossBase += 0;
+         step = crossSpace / (flexLines.length -1);
+     }
+     if(style.alignContent === "space-around") {
+         step = crossSpace / flexLines.length
+         crossBase += crossSign * step / 2;
+    }
+    if(style.alignContent === "stretch") {
+        crossBase += 0;
+        step = 0;
+    }
+
+    //对每一行进行处理
+    flexLines.forEach(function (items) {
+        // 根据是否是stretch，来确定是否填满，还是对剩余空间做分配
+        var lineCrossSize = style.alignContent === "stretch" 
+            ? (items.crossSpace + crossSpace / flexLines.length)
+            : items.crossSize;
+        
+        // 计算每个元素的交叉轴的位置和尺寸
+        for (var i = 0; i < items.length; i++){
+            var item = items[i];
+            var itemStyle = getStyle(item);
+
+            var align = itemStyle.alignSelf || style.alignItems;
+            
+            if (itemStyle.crossSize === null){
+                itemStyle[crossSize]  = align === "stretch" ? lineCrossSize : 0;
+            }
+            if(align === "flex-start"){
+                itemStyle[crossStart] = crossBase;
+                itemStyle[crossEnd] = itemStyle[crossStart] + crossSign * itemStyle[crossSize];
+            }
+            if(align === "flex-end"){
+                itemStyle[crossEnd] = crossBase + crossSign * lineCrossSize;
+                itemStyle[crossStart] = itemStyle[crossEnd] - crossSign * itemStyle[crossSize];
+            }
+            if(align === "center"){
+                itemStyle[crossStart] = crossBase + crossSign * (lineCrossSize - itemStyle[crossSize]) / 2;
+                itemStyle[crossEnd] = itemStyle[crossStart] + crossSign * itemStyle[crossSize];
+            }
+            if(align === "stretch"){
+                itemStyle[crossStart] = crossBase;
+                itemStyle[crossEnd] = crossBase + 
+                    crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== undefined) ? itemStyle[crossSize] : lineCrossSize);
+                itemStyle[crossSize] = crossSize * (itemStyle[crossEnd] - itemStyle[crossStart]);
+            }
+        }
+        crossBase += crossSign * (lineCrossSize + step);
+    });
+
 }
 
-module.export = layout;
+module.exports = layout;
