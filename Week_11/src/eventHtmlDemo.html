@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <div id="a" style="width:100%;height:300px;background:lightblue">
+            <div id="b" style="position: relative;top: 50px;margin: 0 auto;width:200px;height:100px;background:pink">
+        
+            </div>
+        </div>
+    </body>
+    <script>
+        var a = document.getElementById("a");
+        var b = document.getElementById("b");
+
+        a.addEventListener("click", () => {console.log("外层，a 冒泡")});
+        b.addEventListener("click", () => {console.log("内层，b 冒泡")});
+
+        a.addEventListener("click", () => {console.log("外层，a capture")}, true);//捕获时触发
+        b.addEventListener("click", () => {console.log("内层，b capture")}), true;//捕获时触发
+        
+        b.addEventListener("click", () => {console.log("内层，b 冒泡2")})//冒泡后加的后触发
+
+        // a的捕获会最先触发，因为是先捕获后冒泡。b的冒泡，先添加的先触发
+
+    </script>
+</html>
+
