@@ -115,3 +115,140 @@ Range不一定是包含了一个完整的节点，它可以包含半个节点。
 - range.selectNode
 - range.selectNodeContents
 
+<br>
+
+创建Range后的操作
+- var fragment = range.extractContents();
+   - 这个是把range里的内容取出来，会把提取出的内容从原来的DOM移除掉，extractContents()返回的是DocumentFragment对象，DocumentFragment在append的时候，它会把它自己的所有子节点append到DOM树上，但是它自己不会被append到DOM树上
+- range.insertNode(document.createTextNode("aaaa"));
+   - 插入新节点
+
+<br>
+
+# CSSOM
+DOM是对HTML所描述文档的抽象，CSSOM是对CSS文档的抽象
+
+在代码里使用CSS
+- 使用style标签
+- 使用link标签
+
+## document.styleSheets
+
+CSS的一切API，都需要通过document.styleSheets去访问。
+
+styleSheets就是一个样式表，对应着一个style标签或者是一个link标签。
+
+## Rules
+- document.styleSheets[0].cssRules
+- document.styleSheets[0].insertRule("p {color: pink}", 0);
+- document.styleSheets[0].removeRule(0);
+
+- CSSStyleRule (重点)
+- CSSChartsetRule
+- CSSImportRule
+- CSSMediaRule
+- CSSFontFaceRule
+- CSSPageRule
+- CSSNamespaceRule
+- CSSKeyframesRule
+- CSSKeyframeRule
+- CSSSupportsRule
+- ...
+
+<br>
+
+- CSSStyleRule   
+   - selectorText String  选择器部分
+   - style K-V结构
+
+修改css：document.styleSheets[0].cssRules[0].style.color = "lightgreen";
+
+## getComputedStyle
+- window.getComputedStyle(elt, pseudoElt);
+   - elt 想要获取的元素
+   - pseudoElt 可选，伪元素
+
+getComputedStyle能够获取到页面上的元素最终真实渲染的时候的css的属性。也可以获取到页面上的伪元素的css属性。
+
+通过getComputedStyle可以去获取一些元素真实的值，比如transform。还有比如说：有一些CSS动画，它有一些中间态，我们可能想要暂停这个动画，这个时候没有办法通过DOM API、style属性和CSSRules去判断它当前播到哪儿了，因为它是一个中间值，这个时候我们可以用getComputedStyle去处理这个问题。（怎么处理的？）
+
+<br>
+
+# CSSOM View
+在完成layout之后，实际渲染出来的CSS的图形，它也会包含一部分属性。怎么去获取layout甚至是render之后的一些信息呢？这个要靠CSSOM的view部分的API。这部分的API跟我们的CSS语言模型已经不太一致了，它主要是跟浏览器最后画上去的视图非常相关。
+
+## window 
+- **window.innerHeight，window.innerWidth** （重要）
+   - 是浏览器实际渲染区域的宽高
+- window.outerHeight，window.outerWidth
+   - 浏览器窗口总共占的尺寸，包括工具栏什么的
+- **window.devicePixelRatio** （重要）
+   - 屏幕上的物理像素跟代码里的逻辑像素px之间的比值。正常的设备，这两个的比值是1:1，Retina屏上是1:2，在有些安卓机上还有1:3的DPR
+- window.screen
+   - window.screen.width
+   - window.screen.height
+      - 代表屏幕实际上的宽和高
+   - window.screen.availWidth
+   - window.screen.availHeight
+      - 代表可以使用的宽和高
+
+### window API
+当去开一个新的浏览器窗口的时候可以去用
+- window.open("about:blank", "blank", "width:100,height:100,left:100,right:100");
+- moveTo(x,y)
+- moveBy(x,y)
+- resizeTo(x,y)
+- resizeBy(x,y)
+
+## scroll
+元素
+- scrollTop
+- scrollLeft
+   - 当前滚动到的位置
+- scrollWidth
+- scrollHeight
+   - 可滚动内容的最大宽度和高度
+- scroll(x,y)
+   - 滚动到特定的位置
+- scrollBy(x,y)
+   - 在当前基础上，滚动一个差值
+- scrollIntoView()
+   - 滚动到屏幕可见区域
+
+- window
+   - scrollX
+   - scrollY
+   - scroll(x,y)
+   - scrollBy(x,y)
+
+## layout
+在element上
+- getClientRects() （重要）
+   - 获取元素生成的所有的盒
+- getBoundingClientRect() （重要）
+   - 把元素生成的所有盒包含的区域取出来
+
+这两个API是去说去浏览器layout之后结果的一个利器，它能够真实的取到元素的位置。而且这两个API的兼容性非常好。
+
+这两个API登场率是很高的，也是非常好用的。比如要去实现一些拖拽效果，都会使用这两个API去做（怎么用的？）。比如要获取父元素和子元素的相对位置，用getBoundingClientRect()就一目了然了（？没理解）。
+
+<br>
+
+伪元素在页面上是无法被选中的
+
+
+<br>
+
+# 其它API
+
+标准化组织
+- khronos (在计算机图形和视频方面非常有权威性的组织)
+   - OpenGL标准
+   - WebGL
+- ECMA
+   - ECMAScript
+- WHATWG
+   - HTML
+- W3C
+   - webaudio
+   - CG/WG         
