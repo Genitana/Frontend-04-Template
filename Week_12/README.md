@@ -133,7 +133,8 @@ config：config是个一次性的结果，它只有在组件构造的时候会�
 
  ## JSX环境
  1. yarn init 
- 2. yarn add webpack webpack-cli  --dev
+ 2. yarn add webpack webpack-cli  --dev   记得指定版本，先不要用webpack5
  3. yarn add babel-loader --dev
  4. yarn add @babel/core @babel/preset-env --dev
  5. yarn add @babel/plugin-transform-react-jsx --dev
+ 6. yarn add webpack-dev-server --dev

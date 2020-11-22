@@ -1,83 +1,37 @@
-function createElement(type,attributes, ...children){
-    let element ; 
+import  { Component,createElement }  from "./framework" ;
 
-    //createElement("div", {id: "a"}) ,也可能是createElement(Div, {id: "a"})， Div是一个class
-    if (typeof type === "string") {
-        element = new ElementWrapper(type);
-    }else {
-        element = new type;
-    }
 
-    for(let name in attributes) {
-        element.setAttribute(name, attributes[name]);
-    } 
-
-    for (let child of children) {
-        //处理文本节点
-        if (typeof child === "string") {
-            child = new TextWrapper(child);
-        }
-        element.appendChild(child)
-    }
-    return element;
-}
-
-class ElementWrapper {
-    constructor(type){
-        this.root = document.createElement(type);
-    }
-    setAttribute(name, value){
-        this.root.setAttribute(name, value);
-    }
-    appendChild(child){
-        // this.root.appendChild(child);  //这个child也是ElementWrapper类型的，不能直接appendChild(child)
-        child.mountTo(this.root);
-    }
-    mountTo(parent){
-        parent.appendChild(this.root);
-    }
-}
-class TextWrapper {
-    constructor(content){
-        this.root = document.createTextNode(content);
-    }
-    setAttribute(name, value){
-        this.root.setAttribute(name, value);
-    }
-    appendChild(child){
-        // this.root.appendChild(child);  //这个child也是ElementWrapper类型的，不能直接appendChild(child)
-        child.mountTo(this.root);
-    }
-    mountTo(parent){
-        parent.appendChild(this.root);
-    }
-}
-
-class Div{
+class Carousel extends Component{
     constructor(){
+        super();
+        this.attributes = Object.create(null);
+    }
+    setAttribute(name, value) {
+        this.attributes[name] = value;
+    }
+    render() {
+        console.log(555);
         this.root = document.createElement("div");
-
+        for (let record of this.attributes.src) {
+            let child = document.createElement("img");
+            child.src = record;
+            this.root.appendChild(child);
+        }
+        return this.root;
     }
-    setAttribute(name, value){
-        this.root.setAttribute(name, value);
-    }
-    appendChild(child){
-        child.mountTo(this.root);
-    }
-
-    mountTo(parent){
-
-        parent.appendChild(this.root);
+    mountTo(parent) {
+        parent.appendChild(this.render());
     }
 }
 
-let a  = <div id="a">
-    hello,world
-    <span>a</span>
-    <span>b</span>
-    <span></span>
-</div>
-
+let d = [
+"https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg",
+"https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg",
+"https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg",
+"https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg"
+]
 // document.body.appendChild(a);
+
+let  a = <Carousel src={d}/>
 
 a.mountTo(document.body);
