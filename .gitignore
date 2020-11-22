@@ -1,2 +1,4 @@
 */node_modules
 .DS_Store
+/Week_12/jsx/dist/*
+/Week_12/jsx/node_modules/*

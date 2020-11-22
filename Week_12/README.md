@@ -130,4 +130,10 @@ config：config是个一次性的结果，它只有在组件构造的时候会�
 <br><br>
 
 # 为组件添加JSX语法
-   
+
+ ## JSX环境
+ 1. yarn init 
+ 2. yarn add webpack webpack-cli  --dev
+ 3. yarn add babel-loader --dev
+ 4. yarn add @babel/core @babel/preset-env --dev
+ 5. yarn add @babel/plugin-transform-react-jsx --dev

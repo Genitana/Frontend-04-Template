@@ -1,0 +1,38 @@
+Arguments: 
+  /usr/local/Cellar/node/13.7.0/bin/node /usr/local/bin/yarn add webpack webpack-cli
+
+PATH: 
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+Yarn version: 
+  1.21.1
+
+Node version: 
+  13.7.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/webpack: tunneling socket could not be established, cause=Client network socket disconnected before secure TLS connection was established
+      at ClientRequest.onError (/usr/local/lib/node_modules/yarn/lib/cli.js:152151:17)
+      at Object.onceWrapper (events.js:428:26)
+      at ClientRequest.emit (events.js:321:20)
+      at TLSSocket.socketErrorListener (_http_client.js:424:9)
+      at TLSSocket.emit (events.js:321:20)
+      at emitErrorNT (internal/streams/destroy.js:84:8)
+      at processTicksAndRejections (internal/process/task_queues.js:84:21)
+
+npm manifest: 
+  {
+    "name": "jsx",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
