@@ -27,18 +27,27 @@ class Carousel extends Component{
             let move = event => {
                 let x = event.clientX - startX; // 鼠标X轴方向上移动的距离
 
-                for (let child of children) {
-                    child.style.transition = "none";
-                    child.style.transform = `translateX(${- position * 500 + x}px)`; // css里给的图片宽度是500
+                let current = position - Math.round((x - x % 500) / 500);  //当前在屏幕上元素的位置
+
+                for (let offset of [-1, 0, 1]) {
+                    let pos = current + offset;
+                    pos = (pos + children.length) % children.length; // 把-1变成3，-2变成2，-3变成1
+                    children[pos].style.transition = "none";
+                    children[pos].style.transform = `translateX(${- pos * 500 + offset * 500 + x % 500}px)`;
                 }
             }
+
             let up = event => {
                 let x = event.clientX - startX; 
                 position = position - Math.round(x / 500);  // 图片拖够了一半，就显示下一张
-                for (let child of children) {
-                    child.style.transition = "";
-                    child.style.transform = `translateX(${- position * 500}px)`;
+                
+                for (let offset of [0, - Math.sign(Math.round(x / 500) - x + 250 * Math.sign(x))]) {
+                    let pos = position + offset;
+                    pos = (pos + children.length) % children.length; // 把-1变成3，-2变成2，-3变成1
+                    children[pos].style.transition = "";
+                    children[pos].style.transform = `translateX(${- pos * 500 + offset * 500}px)`;
                 }
+
                 document.removeEventListener("mousemove", move);
                 document.removeEventListener("mouseup", up);
             }
