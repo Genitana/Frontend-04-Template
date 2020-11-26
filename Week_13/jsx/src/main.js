@@ -16,7 +16,11 @@ a.mountTo(document.body);
 
 let tl = new Timeline();
 
+window.tl  = tl;
+window.animation =  new Animation({set a (v) {console.log('aaa', v)}}, 'a', 0, 100, 1000, null);
+
 // 与 ES5 一样，在“类”的内部可以使用get和set关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为。
-tl.add(new Animation({set a (v) {console.log('aaa', v)}}, 'a', 0, 100, 1000, null));
+// tl.add(new Animation({set a (v) {console.log('aaa', v)}}, 'a', 0, 100, 1000, null));
+
 
 tl.start();
