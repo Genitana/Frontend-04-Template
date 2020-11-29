@@ -1,5 +1,6 @@
 module.exports = {
-    entry: "./src/main.js",
+    // entry: "./src/main.js",
+    entry: "./src/animation-demo.js",
     module: {
         rules: [
             {
