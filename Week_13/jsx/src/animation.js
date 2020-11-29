@@ -19,15 +19,18 @@ export class Timeline {
                     let t ;  // 运行了的时长
 
                     if(this[START_TIME].get(animation) < startTime)
-                        t = now - startTime - this[PAUSE_TIME];  //要减掉暂停的时间
+                        t = now - startTime - this[PAUSE_TIME] - animation.delay;  //要减掉暂停的时间
                     else 
-                        t = now - this[START_TIME].get(animation) - this[PAUSE_TIME];
+                        t = now - this[START_TIME].get(animation) - this[PAUSE_TIME] - animation.delay;
 
                     if (animation.duration < t) {  // 若运行的时长超过了设置的duration，则停止
                         this[ANIMATIONS].delete(animation);
                         t = animation.duration; //避免receive(time)的time超出duration的问题
                     }
-                    animation.receive(t); 
+
+                    if (t > 0){
+                        animation.receive(t);  // t < 0 说明动画还没开始
+                    }
                 }
                 this[TICK_HANDLER] = requestAnimationFrame(this[TICK]);
             }
@@ -41,7 +44,15 @@ export class Timeline {
             this[PAUSE_TIME] += Date.now() - this[PAUSE_START]; //暂停的时间
             this[TICK]();
         }
-        reset (){}
+        reset (){
+            this.pause();
+            let startTime = Date.now();
+            this[PAUSE_TIME] = 0;
+            this[ANIMATIONS ] = new Set();
+            this[START_TIME] = new Map();
+            this[START_TIME] = 0;
+            this[TICK_HANDLER] = null;
+        }
         add (animation, startTime){
             if (arguments.length < 2) {
                 startTime = Date.now();
@@ -52,20 +63,20 @@ export class Timeline {
 }
 
 export class Animation {
-    constructor(object, property, startValue, endValue, duration, delay, timingFunction,template) {
+    constructor(object, property, startValue, endValue, duration, delay, timingFunction, template) {
         this.object = object;
         this.property = property;
         this.startValue = startValue;
         this.endValue = endValue;
         this.duration = duration;
-        this.timingFunction = timingFunction;
+        this.timingFunction = timingFunction || (v => v);
         this.delay = delay;
-        this.template = template;
+        this.template = template || (v => v);
     }
 
     receive(time) {
         let range = this.endValue - this.startValue;
-
-        this.object[this.property] = this.template(this.startValue + range * time / this.duration);
+        let progress =  this.timingFunction(time / this.duration); // timingFunction是一个返回0~1的函数
+        this.object[this.property] = this.template(this.startValue + range * progress);
     }
 }
