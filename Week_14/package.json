@@ -1,0 +1,9 @@
+{
+  "name": "week_14",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "ecstatic": "^4.1.4"
+  }
+}
