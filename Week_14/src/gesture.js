@@ -50,16 +50,16 @@ element.addEventListener("mousedown", event => {
 
         // 没有按键了再取消监听事件
         if (event.buttons === 0) {
-            element.removeEventListener("mousemove", mousemove);
-            element.removeEventListener("mouseup", mouseup);
+            document.removeEventListener("mousemove", mousemove);
+            document.removeEventListener("mouseup", mouseup);
             isListeningMouse = false;
         }
     }
 
     // 没有监听，则绑定mousemove和mouseup监听事件；如果已经在监听，则不要重复绑定
     if (!isListeningMouse) {
-        element.addEventListener("mousemove", mousemove);
-        element.addEventListener("mouseup", mouseup);
+        document.addEventListener("mousemove", mousemove);
+        document.addEventListener("mouseup", mouseup);
 
         isListeningMouse = true;
     }
@@ -152,7 +152,7 @@ let move = (point, context) => {
 
 let end = (point, context) => {
     if (context.isTap) {
-        console.log("tap");
+        dispatch("tap", {});
         clearTimeout(context.handler);
     }
     if(context.isPan) {
@@ -168,4 +168,15 @@ let cancel = (point, context) => {
     clearTimeout(context.handler);
     console.log("cancel", point.clientX, point.clientY);
 
+}
+
+/**
+ * 派发事件
+ */
+function dispatch(type, properties) {
+    let event = new Event(type);  // 创建一个event
+    for(let name in properties) {
+        event[name] = properties[name];
+    }
+    element.dispatchEvent(event);
 }
