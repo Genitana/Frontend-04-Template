@@ -23,4 +23,4 @@ window.animation =  new Animation({set a (v) {console.log('aaa', v)}}, 'a', 0, 1
 // tl.add(new Animation({set a (v) {console.log('aaa', v)}}, 'a', 0, 100, 1000, null));
 
 
-tl.start();
+// tl.start();
